@@ -1,0 +1,12 @@
+#postinput {
+    width: 600px;
+    height: 200px;
+}
+
+#postcontainer {
+    width: 700px;
+}
+
+#submitpost {
+    float: right;
+}
