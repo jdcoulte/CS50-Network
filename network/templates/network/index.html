@@ -1,26 +1,70 @@
 {% extends "network/layout.html" %}
 
+{% load static %}
+
 {% block body %}
 <div class="row mx-2 mt-2 px-2">
     <h1>Home</h1>
 </div>
 <div class="container border m-4 p-2" id="postcontainer">
-    <div class="row mx-1 mt-2">
+    <div class="row m-2">
         <h3>Have something to share?</h3><br>
-    </div><br>
-    <div class="row mx-1 mb-2">
-    <form action="/post">
-        {% csrf_token %}
-        <textarea id="postinput" class="mb-1 p-2" placeholder="What's on your mind?"></textarea><br>
-        <input type="submit" class="btn btn-primary" value="Post" id="submitpost">
-    </form>
-</div>
+    </div>
+    {% if message_success %}
+
+        <p class="text-success mx-1">{{ message_success }}</p>
+
+    {% elif message_error %}
+
+        <p class="text-danger mx-1">{{ message_error }}</p>
+
+    {% endif %}
+
+    {% if user.is_authenticated %}
+
+        <div class="row m-2">
+            <form action="/post" method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                
+                    {{ field }}<br>
+
+                {% endfor %}
+                <input type="submit" class="btn btn-primary" value="Post" id="submitpost">
+            </form>
+        </div>
+    
+    {% else %}
+
+    <p class="mx-2"><a href="{% url 'login' %}">Log in</a> to post something.</p>
+
+    {% endif %}
 </div>
 <hr>
 <div class="row m-2 p-2">
     <h3>All Posts</h3>
 </div>
-<div class="container border m-4 p-2">
 
-</div>
+    {% for post in posts %}
+        <div class="container border m-4 p-2">
+            <div class="row m-2 px-2">
+                <h4>{{ post.user }}</h4>
+            </div>
+            <div class="row mx-2 px-2">
+                <p class="posttext">{{ post.postbody }}</p>
+            </div>
+            {% if post.user == user %}
+                <div class="row mx-2 px-2">
+                    <p class="posttext"><a href="#">Edit Post</a></p>
+                </div>
+            {% endif %}
+            <div class="row mx-2 px-2">
+                <p class="text-secondary posttext">{{ post.timestamp }}</p><br>
+            </div>
+            <div class="row mx-2 px-2">
+                <img src="{% static 'network/heart.png' %}" class="icon posttext"><p class="text-secondary posttext">&nbsp;&nbsp;{{ post.likes.count }} Likes</p><br>
+            </div>
+        </div>
+    {% endfor %}
+
 {% endblock %}

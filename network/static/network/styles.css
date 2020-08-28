@@ -10,3 +10,25 @@
 #submitpost {
     float: right;
 }
+
+.icon {
+    width: 22px;
+    height: 22px;
+}
+
+.icon:hover {
+    cursor: pointer;
+}
+
+.posttext {
+    margin: 5px 0;
+}
+
+#profile-photo {
+    width: 100%;
+    height: auto;
+}
+
+.following:hover {
+    cursor: pointer;
+}

@@ -1,0 +1,78 @@
+{% extends "network/layout.html" %}
+
+{% load static %}
+
+{% block body %}
+<div class="row mx-2 mt-2 px-2">
+    <h1 class="mx-2">{{ account.username }}'s Profile</h1>
+</div>
+<div class="row mx-2 mt-2 px-2">
+    <div class="col-2 border m-2 p-2">
+        <img id="profile-photo" src="http://s3.amazonaws.com/37assets/svn/765-default-avatar.png">
+    </div>
+    <div class="col-9 m-2 p-2">
+        <div class="row m-0">
+            <div class="col-1 text-center my-0 py-0">
+                <p class="my-0 ml-2 py-0"><strong id="followercount">{{ followers }}</strong></p>
+            </div>
+            <div class="col-1 text-center my-0 py-0">
+                <p class="my-0 ml-2 py-0" class="following"><strong>{{ following }}</strong></p>
+            </div>
+        </div>
+    <div class="row mx-0">
+        <div class="col-1 text-center my-0 py-0">
+            {% if followers == 1 %}
+                <p class="my-0 py-0" id="followerlabel">Follower</p>
+            {% else %}
+                <p class="my-0 py-0" id="followerlabel">Followers</p>
+            {% endif %}
+        </div>
+        <div class="col-1 text-center my-0 py-0">
+            <p class="my-0 py-0" class="following">Following</p>
+        </div>
+    </div>
+        <div class="row m-3 px-2">
+            <p><em>Member since {{ account.date_joined }}</em></p>
+        </div>
+
+        {% if account != user %}
+        
+            <div class="row m-3 px-2" id="followbuttons">
+                {% if follower == False %}
+
+                    <button class="btn btn-primary" data-followerid="{{ user.id }}" data-followeeid="{{ account.id }}" id="follow">Follow</button>
+
+                {% else %}
+
+                    <button class="btn btn-primary" data-followerid="{{ user.id }}" data-followeeid="{{ account.id }}" id="unfollow">Unfollow</button>
+
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+<hr>
+<div class="row m-2 p-2">
+    <h3 class="mx-2 p-2">{{ account.username }}'s Posts</h3>
+</div>
+
+    {% for post in posts %}
+        <div class="container border m-4 p-2">
+            <div class="row mx-2 px-2">
+                <p class="posttext">{{ post.postbody }}</p>
+            </div>
+            {% if post.user == user %}
+                <div class="row mx-2 px-2">
+                    <p class="posttext"><a href="#">Edit Post</a></p>
+                </div>
+            {% endif %}
+            <div class="row mx-2 px-2">
+                <p class="text-secondary posttext">{{ post.timestamp }}</p><br>
+            </div>
+            <div class="row mx-2 px-2">
+                <img src="{% static 'network/heart.png' %}" class="icon posttext"><p class="text-secondary posttext">&nbsp;&nbsp;{{ post.likes.count }} Likes</p><br>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}
