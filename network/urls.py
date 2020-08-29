@@ -11,6 +11,7 @@ urlpatterns = [
     path("register", views.register, name="register"),
     path("post", views.post, name="post"),
     path("users/<str:username>", views.view_user, name="view_user"),
+    path("following", views.following, name="following"),
     path("follow/<int:followerid>/<int:followeeid>", views.follow, name="follow"),
     path("unfollow/<int:followerid>/<int:followeeid>", views.unfollow, name="follow")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

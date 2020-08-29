@@ -42,13 +42,12 @@
 </div>
 <hr>
 <div class="row m-2 p-2">
-    <h3>All Posts</h3>
+    <h3>{{ title }}</h3>
 </div>
-
     {% for post in posts %}
         <div class="container border m-4 p-2">
             <div class="row m-2 px-2">
-                <h4>{{ post.user }}</h4>
+                <a href="/users/{{post.user}}"><h4>{{ post.user }}</h4></a>
             </div>
             <div class="row mx-2 px-2">
                 <p class="posttext">{{ post.postbody }}</p>
@@ -65,6 +64,45 @@
                 <img src="{% static 'network/heart.png' %}" class="icon posttext"><p class="text-secondary posttext">&nbsp;&nbsp;{{ post.likes.count }} Likes</p><br>
             </div>
         </div>
+
+
+    {% empty %}
+
+        <p class="m-2 px-2">No posts yet!</p>
+
     {% endfor %}
+
+    <nav aria-label="Post page navigation">
+        <ul class="pagination justify-content-center">
+            {% if posts.has_previous %}
+
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ posts.previous_page_number }}" tabindex="-1">Previous</a>
+                </li>
+
+            {% else %}
+
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">Previous</a>
+                </li>
+
+            {% endif %}
+
+            {% if posts.has_next %}
+
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ posts.next_page_number }}" tabindex="-1">Next</a>
+                </li>
+
+            {% else %}
+
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">Next</a>
+                </li>
+
+            {% endif %}
+
+        </ul>
+      </nav>
 
 {% endblock %}

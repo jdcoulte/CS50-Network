@@ -29,6 +29,11 @@
     height: auto;
 }
 
-.following:hover {
+#followingcount, #followinglabel {
+    color: #0C6291;
+}
+
+#followingcount:hover, #followinglabel:hover {
     cursor: pointer;
+    color: #1DA4ED;
 }

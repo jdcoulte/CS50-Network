@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if(unfollowbutton) {
         unfollowbutton.addEventListener('click', unfollow);
     }
+
+    
 });
 
 function follow() {
@@ -21,8 +23,7 @@ function follow() {
             document.querySelector("#follow").innerHTML = "Unfollow";
             document.querySelector("#follow").id = "unfollow";
             document.querySelector("#unfollow").addEventListener('click', unfollow);
-            let followercount = parseInt(document.querySelector('#followercount').innerHTML);
-            followercount++;
+            let followercount = result['followers']
             document.querySelector('#followercount').innerHTML = followercount;
             if(followercount === 1) {
                 document.querySelector('#followerlabel').innerHTML = "Follower";
@@ -52,8 +53,7 @@ function unfollow() {
             document.querySelector("#unfollow").innerHTML = "Follow";
             document.querySelector("#unfollow").id = "follow";
             document.querySelector("#follow").addEventListener('click', follow);
-            let followercount = parseInt(document.querySelector('#followercount').innerHTML);
-            followercount--;
+            let followercount = result['followers']
             document.querySelector('#followercount').innerHTML = followercount;
             if(followercount === 1) {
                 document.querySelector('#followerlabel').innerHTML = "Follower";

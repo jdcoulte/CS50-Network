@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
 import sys
 import datetime
 import json
@@ -14,10 +15,14 @@ from .forms import PostForm
 
 def index(request):
     form = PostForm()
-    posts = Post.objects.order_by("-timestamp")
+    allposts = Post.objects.order_by("-timestamp")
+    paginator = Paginator(allposts, 10)
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number)
     return render(request, "network/index.html", {
         'form': form,
-        'posts': posts
+        'posts': posts,
+        'title': "All Posts"
     })
 
 
@@ -83,16 +88,26 @@ def post(request):
             post.timestamp = datetime.datetime.now()
             post.save()
             newform = PostForm()
+            allposts = Post.objects.order_by("-timestamp")
+            paginator = Paginator(allposts, 10)
+            page_number = request.GET.get('page')
+            posts = paginator.get_page(page_number)
             return render(request, "network/index.html", {
                 "message_success": "Post saved",
-                "form": newform
+                "form": newform,
+                "posts": posts,
+                "title": "All Posts"
             })
         else:
-            posts = Post.objects.order_by("-timestamp")
+            allposts = Post.objects.order_by("-timestamp")
+            paginator = Paginator(allposts, 10)
+            page_number = request.GET.get('page')
+            posts = paginator.get_page(page_number)
             return render(request, "network/index.html", {
             "message_error": "Error, please try again",
             "form": form,
-            "posts": posts
+            "posts": posts,
+            "title": "All Posts"
         })
     else:
         return HttpResponseRedirect(reverse("index"))
@@ -106,7 +121,10 @@ def view_user(request, username):
     else:
         follower = False
 
-    posts = account.user_posts.all()
+    allposts = account.user_posts.all()
+    paginator = Paginator(allposts, 10)
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number)
     return render(request, "network/profile.html", {
         "account": account,
         "followers": followers,
@@ -127,8 +145,10 @@ def follow(request, followerid, followeeid):
     follow.follower = follower
     follow.followee = followee
     follow.save()
+    followers = followee.followers.count()
     return JsonResponse({
-        "message": "success"
+        "message": "success",
+        "followers": followers
     })
 
 @login_required()
@@ -141,6 +161,24 @@ def unfollow(request, followerid, followeeid):
             "message": "Invalid follower or followee ID."
         })
     follow.delete()
+    followers = followee.followers.count()
     return JsonResponse({
-        "message": "success"
+        "message": "success",
+        "followers": followers
+    })
+
+@login_required()
+def following(request):
+    user = request.user
+    followedaccounts = user.followed_accounts.all()
+    allposts = Post.objects.filter(pk__in=followedaccounts)
+    paginator = Paginator(allposts, 10)
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number)
+    form = PostForm()
+    title = "Posts by accounts followed by " + user.username
+    return render(request, "network/index.html", {
+        'form': form,
+        'posts': posts,
+        'title': title
     })

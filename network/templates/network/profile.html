@@ -16,7 +16,7 @@
                 <p class="my-0 ml-2 py-0"><strong id="followercount">{{ followers }}</strong></p>
             </div>
             <div class="col-1 text-center my-0 py-0">
-                <p class="my-0 ml-2 py-0" class="following"><strong>{{ following }}</strong></p>
+                <p class="my-0 ml-2 py-0"><strong>{{ following }}</strong></p>
             </div>
         </div>
     <div class="row mx-0">
@@ -28,7 +28,7 @@
             {% endif %}
         </div>
         <div class="col-1 text-center my-0 py-0">
-            <p class="my-0 py-0" class="following">Following</p>
+            <p class="my-0 py-0">Following</p>
         </div>
     </div>
         <div class="row m-3 px-2">
@@ -73,6 +73,9 @@
                 <img src="{% static 'network/heart.png' %}" class="icon posttext"><p class="text-secondary posttext">&nbsp;&nbsp;{{ post.likes.count }} Likes</p><br>
             </div>
         </div>
+
+    {% empty %}
+        <p>No Posts</p>
     {% endfor %}
 
 {% endblock %}
