@@ -29,11 +29,20 @@
     height: auto;
 }
 
-#followingcount, #followinglabel {
+#followingcount, #followinglabel, .editpost {
     color: #0C6291;
 }
 
-#followingcount:hover, #followinglabel:hover {
+#followingcount:hover, #followinglabel:hover, .editpost:hover, .like:hover, .unlike:hover {
     cursor: pointer;
     color: #1DA4ED;
+}
+
+.editpostfield {
+    width: 600px;
+    height: 200px;
+}
+
+.editpostform {
+    display: none;
 }

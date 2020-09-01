@@ -15,14 +15,19 @@ from .forms import PostForm
 
 def index(request):
     form = PostForm()
-    allposts = Post.objects.order_by("-timestamp")
+    allposts = Post.objects.all().order_by("-timestamp")
     paginator = Paginator(allposts, 10)
     page_number = request.GET.get('page')
     posts = paginator.get_page(page_number)
+    if request.user.is_authenticated:
+        liked_posts = request.user.liked_posts.all()
+    else:
+        liked_posts = []
     return render(request, "network/index.html", {
         'form': form,
         'posts': posts,
-        'title': "All Posts"
+        'title': "All Posts",
+        'liked_posts': liked_posts
     })
 
 
@@ -88,7 +93,7 @@ def post(request):
             post.timestamp = datetime.datetime.now()
             post.save()
             newform = PostForm()
-            allposts = Post.objects.order_by("-timestamp")
+            allposts = Post.objects.all().order_by("-timestamp")
             paginator = Paginator(allposts, 10)
             page_number = request.GET.get('page')
             posts = paginator.get_page(page_number)
@@ -99,7 +104,7 @@ def post(request):
                 "title": "All Posts"
             })
         else:
-            allposts = Post.objects.order_by("-timestamp")
+            allposts = Post.objects.all().order_by("-timestamp")
             paginator = Paginator(allposts, 10)
             page_number = request.GET.get('page')
             posts = paginator.get_page(page_number)
@@ -121,7 +126,7 @@ def view_user(request, username):
     else:
         follower = False
 
-    allposts = account.user_posts.all()
+    allposts = account.user_posts.all().order_by("-timestamp")
     paginator = Paginator(allposts, 10)
     page_number = request.GET.get('page')
     posts = paginator.get_page(page_number)
@@ -170,8 +175,11 @@ def unfollow(request, followerid, followeeid):
 @login_required()
 def following(request):
     user = request.user
-    followedaccounts = user.followed_accounts.all()
-    allposts = Post.objects.filter(pk__in=followedaccounts)
+    following = user.followed_accounts.all()
+    followedaccounts = []
+    for account in following:
+        followedaccounts.append(account.followee)
+    allposts = Post.objects.filter(user__in=followedaccounts).order_by("-timestamp")
     paginator = Paginator(allposts, 10)
     page_number = request.GET.get('page')
     posts = paginator.get_page(page_number)
@@ -180,5 +188,59 @@ def following(request):
     return render(request, "network/index.html", {
         'form': form,
         'posts': posts,
-        'title': title
+        'title': title,
+        'followedaccounts': followedaccounts
     })
+
+@login_required()
+def editpost(request):
+    if request.method == "POST":
+        postid = request.POST.get('postid','')
+        post = Post.objects.get(pk=postid)
+        if post.user == request.user:
+            post.postbody = request.POST.get('postbody','')
+            post.timestamp = datetime.datetime.now()
+            post.save()
+            newform = PostForm()
+            allposts = Post.objects.all().order_by("-timestamp")
+            paginator = Paginator(allposts, 10)
+            page_number = request.GET.get('page')
+            posts = paginator.get_page(page_number)
+            return render(request, "network/index.html", {
+                "message_success": "Post saved",
+                "form": newform,
+                "posts": posts,
+                "title": "All Posts"
+            })
+        else:
+            return HttpResponseRedirect(reverse("index"))
+    else:
+        return HttpResponseRedirect(reverse("index"))
+
+@login_required()
+def like(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        postid = data.get('postid')
+        post = Post.objects.get(pk=postid)
+        post.likes.add(request.user)
+        post.save()
+        return JsonResponse({
+            "message": "success"
+    })
+    else:
+        return JsonResponse({"error": "POST request required."}, status=400)
+
+@login_required()
+def unlike(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        postid = data.get('postid')
+        post = Post.objects.get(pk=postid)
+        post.likes.remove(request.user)
+        post.save()
+        return JsonResponse({
+            "message": "success"
+    })
+    else:
+        return JsonResponse({"error": "POST request required."}, status=400)
